@@ -70,8 +70,8 @@ Try applying our attack to new tokenizers! Skip step 1 if you are reproducing re
 # Citation
 ```
 @inproceedings{hayase-etal-2024-data,
-      title={Data Mixture Inference: What do BPE Tokenizers Reveal about their Training Data?},
-      author={Jonathan Hayase* and Alisa Liu* and Yejin Choi and Sewoong Oh and Noah A. Smith},
+      title={Data Mixture Inference: What do {BPE} Tokenizers Reveal about their Training Data?},
+      author={Jonathan Hayase and Alisa Liu and Yejin Choi and Sewoong Oh and Noah A. Smith},
       booktitle={The Thirty-eighth Annual Conference on Neural Information Processing Systems},
       year={2024},
       url={https://openreview.net/forum?id=EHXyeImux0}
