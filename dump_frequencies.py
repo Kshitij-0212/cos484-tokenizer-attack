@@ -30,7 +30,7 @@ DEFAULT_NUM_BYTES = 10**9
 @click.option(
     '--corpus_dir',
     type=str,
-    default='/gscratch/scrubbed/alisaliu/oscar-corpus/processed',
+    default='/scratch/network/ks2663/COLLAB/oscar-corpus/processed',
     help='Directory containing language subdirectories with text files, to use for estimating merge frequencies.'
 )
 @click.option(
@@ -48,7 +48,7 @@ def main(experiment_dir: str, lang_code: str, corpus_dir: str, model_name: str, 
     corpus_dir = Path(corpus_dir)
     experiment_dir = Path(experiment_dir)
     lang_dir = lang_code if num_bytes == DEFAULT_NUM_BYTES else f'{lang_code}/{"{:.0e}".format(num_bytes).replace("e+", "e")}'
-    os.chdir('/gscratch/xlab/alisaliu/hack-tokenizers')
+    os.chdir('/scratch/network/ks2663/COLLAB/cos484-tokenizer-attack')
 
     print(f'We will dump frequencies in {experiment_dir}/{lang_dir}...')
 
