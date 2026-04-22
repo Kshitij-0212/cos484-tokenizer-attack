@@ -1,0 +1,17 @@
+{
+     "byte_count": {
+          "academic": 6025000000,
+          "web": 873000000,
+          "wikipedia": 373000000,
+          "code": 2728999999
+     },
+     "total_bytes": 10000000000,
+     "train_files": {
+          "/scratch/network/ks2663/COLLAB/domain-corpus/academic/arxiv_chunk_aj.txt": 1,
+          "/scratch/network/ks2663/COLLAB/domain-corpus/academic/arxiv_chunk_ap_truncated_656290880.txt": 1,
+          "/scratch/network/ks2663/COLLAB/domain-corpus/web/web_chunk_al_truncated_873000000.txt": 1,
+          "/scratch/network/ks2663/COLLAB/domain-corpus/wikipedia/23_truncated_373000000.txt": 1,
+          "/scratch/network/ks2663/COLLAB/domain-corpus/code/6adcf92fb2ee48059cb60579f2e931f7.txt": 1,
+          "/scratch/network/ks2663/COLLAB/domain-corpus/code/3be6a5cc7428401393c23e5516a43537_truncated_369811631.txt": 1
+     }
+}
