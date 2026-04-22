@@ -1,4 +1,4 @@
-#!/bin/bash
+ #!/bin/bash
 #SBATCH --job-name=train_code
 #SBATCH --output=logs/train_code_%A_%a.log
 #SBATCH --time=2:00:00
