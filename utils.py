@@ -333,7 +333,7 @@ def load_data(data_root, verbose=False, subdir=None, langlist=None):
         if not item.is_dir() or item.name.startswith("."):
             continue
 
-        if data_root.parent.name.startswith("llm") and (
+        if langlist is None and data_root.parent.name.startswith("llm") and (
             item.name
             not in LLM_LANGS
         ):
