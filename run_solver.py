@@ -5,6 +5,7 @@ import time
 from functools import partial
 from pathlib import Path
 
+import os
 import gurobipy as gp
 import numpy as np
 import simdjson as json
@@ -25,7 +26,13 @@ def lazy_optimize(
     max_iters=300000000,
     max_add=100,
     debug=False,
+    checkpoint_path=None, # checkpoint 
+    checkpoint_interval=600, # adding 10 mins checkpoint
 ):
+    # Reset checkpoint timer at start
+    lazy_optimize._last_checkpoint = 0
+    start_time, solver_time = time.perf_counter(), 0
+
     langs = list(pair_counts.keys())
     num_langs = len(pair_counts)
     merge_subset = [str(merge) for merge in merges[:num_merges]]
@@ -134,7 +141,6 @@ def lazy_optimize(
     active_set = [None] * len(merge_subset)
     all_constraints, missing_merges = set(), set()
 
-    start_time, solver_time = time.perf_counter(), 0
     for epoch in range(max_iters):
         # initialize the priority queue
         mix = lang_vals / denoms
@@ -285,6 +291,29 @@ def lazy_optimize(
             dict(sorted(zip(langs, lang_vals), key=lambda langfreq: -langfreq[1])[:10])
         )
 
+        # checkpoint every checkpoint_interval seconds
+        if checkpoint_path is not None:
+            elapsed = time.perf_counter() - start_time
+            if elapsed - getattr(lazy_optimize, '_last_checkpoint', 0) >= checkpoint_interval:
+                lazy_optimize._last_checkpoint = elapsed
+                checkpoint = dict(
+                    lang_vals=dict(sorted(
+                        zip(langs, lang_vals.tolist()),
+                        key=lambda x: -x[1]
+                    )),
+                    loss=float(m.ObjVal),
+                    loss_viol=float(sum(viol_vals)),
+                    loss_pair_viol=float(sum(pair_viol_vals.values())),
+                    merge_step=i,
+                    elapsed_seconds=elapsed,
+                    num_constraints=len(all_constraints),
+                    converged=False,
+                )
+                with open(checkpoint_path, 'w') as f:
+                    json.dump(checkpoint, f)
+                if verbose:
+                    print(f"[checkpoint saved at {elapsed:.0f}s, merge {i}]")
+
     return dict(
         lang_vals=dict(zip(langs, lang_vals.tolist())),
         viol_vals=viol_vals,
@@ -347,8 +376,16 @@ if __name__ == "__main__":
         debug=False,
     )
 
-    solution = lazy_optimize(merges, pair_counts, training_counts[args.denom], **kwargs)
-
+    # checkpoint modification: construct checkpoint path and pass to lazy_optimize
+    variant_str = "" if args.variant is None else f"_{args.variant}"
+    checkpoint_path = root / f"checkpoint_{args.denom}_{args.merges}{variant_str}.json"
+    
+    solution = lazy_optimize(
+        merges, pair_counts, training_counts[args.denom],
+        checkpoint_path=checkpoint_path,
+        checkpoint_interval=60,
+        **kwargs
+    )
     # Sort the lang vals for convenience
     solution["lang_vals"] = dict(
         sorted(solution["lang_vals"].items(), key=lambda langfreq: langfreq[1])
@@ -357,13 +394,16 @@ if __name__ == "__main__":
     # Convert set to list for JSON
     solution["missing_merges"] = list(solution["missing_merges"])
 
+    # mark checkpoint as converged and clean it up
+    if checkpoint_path.exists():
+        os.remove(checkpoint_path)
+
     # Dump the args into the output as well
     solution['kwargs'] = kwargs
     solution['kwargs']['denom'] = args.denom
     
     print(solution["lang_vals"])
 
-    variant_str = "" if args.variant is None else f"_{args.variant}"
     langlist_str = "" if args.langlist is None else f"_{args.langlist}"
     with (root / f"solution_{args.denom}_{args.merges}{variant_str}{langlist_str}.json").open("w") as f:
         json.dump(solution, f)
