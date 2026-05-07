@@ -174,3 +174,7 @@ used_merges
 /notebooks
 experiments_sample.tar.xz
 experiments_sample.tar.xz
+experiments_shuffled/
+work_items/
+slurm_scripts/
+retry_loop.sh
